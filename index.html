@@ -14,6 +14,8 @@
         <h1>Smart Home Dashboard</h1>
         <div id="temperature-chart" class="chart"></div>
         <div id="humidity-chart" class="chart"></div>
+        <div id="pressure-chart" class="chart"></div>
+        <div id="light-intensity-chart" class="chart"></div>
         <div id="motion-status"></div>
         <div id="smoke-status"></div>
     </div>
@@ -25,6 +27,8 @@
                 .then(data => {
                     document.getElementById('temperature-chart').innerHTML = '';
                     document.getElementById('humidity-chart').innerHTML = '';
+                    document.getElementById('pressure-chart').innerHTML = '';
+                    document.getElementById('light-intensity-chart').innerHTML = '';
 
                     var temperatureData = [{
                         x: [new Date()],
@@ -40,8 +44,24 @@
                         name: 'Humidity'
                     }];
 
+                    var pressureData = [{
+                        x: [new Date()],
+                        y: [data.pressure],
+                        type: 'scatter',
+                        name: 'Pressure'
+                    }];
+
+                    var lightIntensityData = [{
+                        x: [new Date()],
+                        y: [data.light_intensity],
+                        type: 'scatter',
+                        name: 'Light Intensity'
+                    }];
+
                     Plotly.newPlot('temperature-chart', temperatureData, { title: 'Temperature (°C)' });
                     Plotly.newPlot('humidity-chart', humidityData, { title: 'Humidity (%)' });
+                    Plotly.newPlot('pressure-chart', pressureData, { title: 'Pressure (hPa)' });
+                    Plotly.newPlot('light-intensity-chart', lightIntensityData, { title: 'Light Intensity (lux)' });
 
                     document.getElementById('motion-status').innerText = 'Motion Detected: ' + data.motion;
                     document.getElementById('smoke-status').innerText = 'Smoke Detected: ' + data.smoke;
