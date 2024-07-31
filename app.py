@@ -1,8 +1,5 @@
-from flask import Flask, render_template
-import plotly.graph_objs as go
-import pandas as pd
+from flask import Flask, render_template, jsonify
 import random
-import time
 
 app = Flask(__name__)
 
@@ -17,13 +14,12 @@ def generate_data():
 
 @app.route('/')
 def index():
-    data = generate_data()
-    return render_template('index.html', data=data)
+    return render_template('index.html')
 
 @app.route('/data')
 def data():
     data = generate_data()
-    return data
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)

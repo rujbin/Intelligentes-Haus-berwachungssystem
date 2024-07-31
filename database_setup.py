@@ -1,24 +1,45 @@
-# database_setup.py
-
-from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sqlite3
 import datetime
 
-Base = declarative_base()
+# Verbindung zu SQLite herstellen
+try:
+    conn = sqlite3.connect('smart_home.db')
+    c = conn.cursor()
 
-class SensorData(Base):
-    __tablename__ = 'sensor_data'
-    id = Column(Integer, primary_key=True)
-    sensor_type = Column(String)
-    value = Column(Float)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    # Tabelle erstellen
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS sensor_data (
+            id INTEGER PRIMARY KEY,
+            timestamp TEXT,
+            temperature REAL,
+            humidity REAL,
+            motion BOOLEAN,
+            smoke BOOLEAN
+        )
+    ''')
 
-def init_db():
-    engine = create_engine('sqlite:///sensor_data.db')
-    Base.metadata.create_all(engine)
-    return engine
+    def save_data(data):
+        try:
+            data['timestamp'] = datetime.datetime.now().isoformat()
+            c.execute('''
+                INSERT INTO sensor_data (timestamp, temperature, humidity, motion, smoke)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (data['timestamp'], data['temperature'], data['humidity'], data['motion'], data['smoke']))
+            conn.commit()
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e.args[0]}")
 
-if __name__ == "__main__":
-    engine = init_db()
-    print("Datenbank und Tabellen erstellt")
+    # Beispielhafte Datenspeicherung
+    data = {
+        "temperature": 22.5,
+        "humidity": 45.2,
+        "motion": True,
+        "smoke": False
+    }
+    save_data(data)
+
+except sqlite3.Error as e:
+    print(f"An error occurred while connecting to the database: {e.args[0]}")
+finally:
+    if 'conn' in locals():
+        conn.close()

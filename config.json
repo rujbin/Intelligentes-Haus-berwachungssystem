@@ -1,0 +1,5 @@
+{
+    "temperature_range": [15, 25],
+    "humidity_range": [30, 70],
+    "sleep_time": 1
+}
