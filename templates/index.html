@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        .chart {
+            height: 400px;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Home Dashboard</h1>
+        <div id="temperature-chart" class="chart"></div>
+        <div id="humidity-chart" class="chart"></div>
+        <div id="pressure-chart" class="chart"></div>
+        <div id="light-intensity-chart" class="chart"></div>
+        <div id="motion-status" class="status"></div>
+        <div id="smoke-status" class="status"></div>
+    </div>
+
+    <script>
+        // Arrays zur Speicherung der Datenpunkte
+        var temperatureData = [];
+        var humidityData = [];
+        var pressureData = [];
+        var lightIntensityData = [];
+
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    var now = new Date();
+
+                    // Hinzufügen neuer Datenpunkte
+                    temperatureData.push({ x: now, y: data.temperature });
+                    humidityData.push({ x: now, y: data.humidity });
+                    pressureData.push({ x: now, y: data.pressure });
+                    lightIntensityData.push({ x: now, y: data.light_intensity });
+
+                    // Aktualisierung der Diagramme
+                    Plotly.newPlot('temperature-chart', [{ x: temperatureData.map(d => d.x), y: temperatureData.map(d => d.y), type: 'scatter', name: 'Temperatur' }], { title: 'Temperatur (°C)' });
+                    Plotly.newPlot('humidity-chart', [{ x: humidityData.map(d => d.x), y: humidityData.map(d => d.y), type: 'scatter', name: 'Feuchtigkeit' }], { title: 'Feuchtigkeit (%)' });
+                    Plotly.newPlot('pressure-chart', [{ x: pressureData.map(d => d.x), y: pressureData.map(d => d.y), type: 'scatter', name: 'Druck' }], { title: 'Druck (hPa)' });
+                    Plotly.newPlot('light-intensity-chart', [{ x: lightIntensityData.map(d => d.x), y: lightIntensityData.map(d => d.y), type: 'scatter', name: 'Lichtintensität' }], { title: 'Lichtintensität (lux)' });
+
+                    // Aktualisierung der Statusanzeige
+                    document.getElementById('motion-status').innerText = 'Bewegung erkannt: ' + (data.motion ? 'Ja' : 'Nein');
+                    document.getElementById('smoke-status').innerText = 'Rauch erkannt: ' + (data.smoke ? 'Ja' : 'Nein');
+                });
+        }
+
+        // Daten alle 1 Sekunde abrufen und aktualisieren
+        setInterval(fetchData, 1000);
+    </script>
+</body>
+</html>
