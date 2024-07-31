@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Home Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; }
+        .chart { height: 400px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Smart Home Dashboard</h1>
+        <div id="temperature-chart" class="chart"></div>
+        <div id="humidity-chart" class="chart"></div>
+        <div id="motion-status"></div>
+        <div id="smoke-status"></div>
+    </div>
+
+    <script>
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature-chart').innerHTML = '';
+                    document.getElementById('humidity-chart').innerHTML = '';
+
+                    var temperatureData = [{
+                        x: [new Date()],
+                        y: [data.temperature],
+                        type: 'scatter',
+                        name: 'Temperature'
+                    }];
+
+                    var humidityData = [{
+                        x: [new Date()],
+                        y: [data.humidity],
+                        type: 'scatter',
+                        name: 'Humidity'
+                    }];
+
+                    Plotly.newPlot('temperature-chart', temperatureData, { title: 'Temperature (°C)' });
+                    Plotly.newPlot('humidity-chart', humidityData, { title: 'Humidity (%)' });
+
+                    document.getElementById('motion-status').innerText = 'Motion Detected: ' + data.motion;
+                    document.getElementById('smoke-status').innerText = 'Smoke Detected: ' + data.smoke;
+                });
+        }
+
+        setInterval(fetchData, 1000);
+    </script>
+</body>
+</html>
