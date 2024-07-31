@@ -1,5 +1,7 @@
 {
     "temperature_range": [15, 25],
     "humidity_range": [30, 70],
-    "sleep_time": 1
+    "pressure_range": [950, 1050],
+    "sleep_time": 1,
+    "light_intensity_range": [0, 1000]  // Beispiel für neuen Sensor
 }
